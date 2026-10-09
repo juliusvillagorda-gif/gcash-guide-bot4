@@ -112,14 +112,20 @@ def random_fictional_sample():
 def random_sample_text():
     item = random_fictional_sample()
     return (
-        "🎲 BAGONG RANDOM SAMPLE — KATHANG-ISIP LAMANG\\n\\n"
-        f"Pangalan: {item['pangalan']}\\n"
-        f"Gitnang pangalan: {item['gitna']}\\n"
-        f"Apelyido: {item['apelyido']}\\n"
-        f"Address: {item['address']}\\n"
-        f"Birthday: {item['birthday']}\\n\\n"
-        "Pindutin ang “🔀 I-shuffle ulit” para sa panibagong kombinasyon. "
-        "Hindi totoong identity ang mga ito at hindi dapat gamitin sa registration."
+        "🎲 BAGONG RANDOM SAMPLE\n"
+        "━━━━━━━━━━━━━━━━━━\n\n"
+        "👤 PANGALAN\n"
+        f"   First name:  {item['pangalan']}\n"
+        f"   Middle name: {item['gitna']}\n"
+        f"   Apelyido:    {item['apelyido']}\n\n"
+        "🏠 ADDRESS\n"
+        f"   {item['address']}\n\n"
+        "🎂 BIRTHDAY\n"
+        f"   {item['birthday']}\n\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        "⚠️ Kathang-isip lamang ang sample na ito.\n"
+        "Huwag gamitin bilang totoong personal na impormasyon.\n\n"
+        "🔀 Pindutin ang “I-shuffle ulit” para sa bagong sample."
     )
 
 def api(method, payload=None, timeout=35):
