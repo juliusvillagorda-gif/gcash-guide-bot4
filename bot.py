@@ -62,6 +62,66 @@ SAMPLES = [
     {"pangalan": "May", "gitna": "Torres", "apelyido": "Ramos", "address": "41 Rosal Street, Barangay Pag-asa, Bayan Halimbawa", "birthday": "28 Hulyo 2000"},
 ]
 
+
+# Randomized fictional values: each click can produce a new combination.
+FIRST_NAMES = [
+    "Juan", "Maria", "Pedro", "Ana", "Jose", "Liza", "Marco", "Rosa", "Daniel", "Elena",
+    "Miguel", "Sofia", "Andres", "Clara", "Ramon", "Nina", "Paolo", "Bea", "Carlo", "Mila",
+    "Ernesto", "Joy", "Noel", "Irene", "Luis", "Diana", "Arman", "Faith", "Ben", "Grace",
+    "Rico", "Ella", "Nestor", "Lourdes", "Gabriel", "Mara", "Felix", "Celia", "Anton", "Lani",
+    "Oscar", "Tina", "Rafael", "Aira", "Simon", "Luna", "Emilio", "Patricia", "Adrian", "May"
+]
+MIDDLE_NAMES = [
+    "Dela Cruz", "Reyes", "Garcia", "Lopez", "Aquino", "Castro", "Torres", "Bautista",
+    "Rivera", "Perez", "Ramos", "Mendoza", "Navarro", "Villanueva", "Morales", "Santiago",
+    "Flores", "Gonzales", "Diaz", "Santos"
+]
+LAST_NAMES = [
+    "Santos", "Dela Cruz", "Ramos", "Mendoza", "Flores", "Navarro", "Villanueva", "Morales",
+    "Santiago", "Gonzales", "Aquino", "Castillo", "Rivera", "Perez", "Torres", "Bautista",
+    "Garcia", "Reyes", "Castro", "Diaz"
+]
+STREETS = [
+    "Halimbawang Street", "Ulirang Road", "Sampaguita Lane", "Rosal Street", "Maligaya Avenue",
+    "Mabini Road", "Ilang-Ilang Street", "Liwayway Lane", "Pag-asa Avenue", "Masinop Road",
+    "Mabuhay Street", "Payapa Lane", "Bagong Buhay Road", "Masagana Street", "Mapayapa Avenue"
+]
+BARANGAYS = [
+    "Barangay Sample", "Barangay Halimbawa", "Barangay Pag-asa", "Barangay Masaya",
+    "Barangay Mabini", "Barangay Malinis", "Barangay Bagong Araw", "Barangay Pagkakaisa",
+    "Barangay Malaya", "Barangay Masagana", "Barangay Payapa", "Barangay Maunlad"
+]
+MONTHS = [
+    "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo",
+    "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+]
+
+def random_fictional_sample():
+    import random
+    return {
+        "pangalan": random.choice(FIRST_NAMES),
+        "gitna": random.choice(MIDDLE_NAMES),
+        "apelyido": random.choice(LAST_NAMES),
+        "address": (
+            f"{random.randint(1, 999)} {random.choice(STREETS)}, "
+            f"{random.choice(BARANGAYS)}, Lungsod Halimbawa"
+        ),
+        "birthday": f"{random.randint(1, 28):02d} {random.choice(MONTHS)} {random.randint(1985, 2004)}",
+    }
+
+def random_sample_text():
+    item = random_fictional_sample()
+    return (
+        "🎲 BAGONG RANDOM SAMPLE — KATHANG-ISIP LAMANG\\n\\n"
+        f"Pangalan: {item['pangalan']}\\n"
+        f"Gitnang pangalan: {item['gitna']}\\n"
+        f"Apelyido: {item['apelyido']}\\n"
+        f"Address: {item['address']}\\n"
+        f"Birthday: {item['birthday']}\\n\\n"
+        "Pindutin ang “🔀 I-shuffle ulit” para sa panibagong kombinasyon. "
+        "Hindi totoong identity ang mga ito at hindi dapat gamitin sa registration."
+    )
+
 def api(method, payload=None, timeout=35):
     response = requests.post(f"{API}/{method}", json=payload or {}, timeout=timeout)
     response.raise_for_status()
@@ -78,7 +138,7 @@ def send_message(chat_id, text, keyboard=None):
 
 def main_menu():
     return [
-        [{"text": "📋 50 Sample", "callback_data": "samples"}],
+        [{"text": "🎲 Random Sample", "callback_data": "random_sample"}],
         [{"text": "✍️ Sample ng Pangalan", "callback_data": "name"},
          {"text": "🏠 Sample ng Address", "callback_data": "address"}],
         [{"text": "🎂 Sample ng Birthday", "callback_data": "birthday"}],
@@ -142,45 +202,39 @@ def handle_callback(callback):
 
     api("answerCallbackQuery", {"callback_query_id": callback_id})
 
-    if data == "samples":
-        # Ipakita ang 10 sa bawat mensahe para madaling basahin; 50 lahat ay maaabot.
-        keyboard = []
-        for start in range(0, 50, 10):
-            keyboard.append([{
-                "text": f"Samples {start + 1}–{start + 10}",
-                "callback_data": f"batch:{start}"
-            }])
-        keyboard.append([{"text": "⬅️ Menu", "callback_data": "menu"}])
-        send_message(chat_id, "Pumili ng pangkat ng samples (50 lahat):", keyboard)
-    elif data.startswith("batch:"):
-        start = int(data.split(":", 1)[1])
-        if start not in (0, 10, 20, 30, 40):
-            send_message(chat_id, "Hindi wastong sample group.", main_menu())
-            return
-        for index in range(start, start + 10):
-            send_message(chat_id, sample_text(SAMPLES[index], index + 1))
-        send_message(chat_id, "Tapos na ang pangkat na ito.", [
-            [{"text": "📋 Ibang samples", "callback_data": "samples"}],
+    if data in ("samples", "random_sample"):
+        send_message(chat_id, random_sample_text(), [
+            [{"text": "🔀 I-shuffle ulit", "callback_data": "random_sample"}],
+            [{"text": "✍️ Random na Pangalan", "callback_data": "name"},
+             {"text": "🏠 Random na Address", "callback_data": "address"}],
+            [{"text": "🎂 Random na Birthday", "callback_data": "birthday"}],
             [{"text": "⬅️ Menu", "callback_data": "menu"}]
         ])
     elif data == "name":
+        import random
+        item = random_fictional_sample()
         send_message(chat_id,
-            "✍️ SAMPLE NG PANGALAN\n\n"
-            "First name: Juan\nMiddle name: Dela Cruz\nLast name: Santos\n\n"
-            "KATHANG-ISIP LAMANG. Ilagay sa opisyal na form ang sarili mong pangalan ayon sa hinihinging format.",
-            main_menu())
+            "✍️ RANDOM NA PANGALAN — KATHANG-ISIP LAMANG\n\n"
+            f"Pangalan: {item['pangalan']}\nGitnang pangalan: {item['gitna']}\nApelyido: {item['apelyido']}\n\n"
+            "Pindutin ulit ang Random na Pangalan para sa bagong kombinasyon.",
+            [[{"text": "🔀 Random na Pangalan ulit", "callback_data": "name"}],
+             [{"text": "⬅️ Menu", "callback_data": "menu"}]])
     elif data == "address":
+        item = random_fictional_sample()
         send_message(chat_id,
-            "🏠 SAMPLE NG ADDRESS\n\n"
-            "123 Halimbawang Street, Barangay Sample, Lungsod Halimbawa\n\n"
-            "KATHANG-ISIP LAMANG. Gamitin ang sarili mong kasalukuyan at tamang address.",
-            main_menu())
+            "🏠 RANDOM NA ADDRESS — KATHANG-ISIP LAMANG\n\n"
+            f"{item['address']}\n\n"
+            "Pindutin ulit para sa bagong halimbawa. Huwag gamitin bilang totoong address.",
+            [[{"text": "🔀 Random na Address ulit", "callback_data": "address"}],
+             [{"text": "⬅️ Menu", "callback_data": "menu"}]])
     elif data == "birthday":
+        item = random_fictional_sample()
         send_message(chat_id,
-            "🎂 SAMPLE NG BIRTHDAY\n\n"
-            "15 Enero 1998\n\n"
-            "Halimbawa lamang ito. Ilagay ang sarili mong tamang petsa ng kapanganakan at sundin ang format na hinihingi ng opisyal na app.",
-            main_menu())
+            "🎂 RANDOM NA BIRTHDAY — KATHANG-ISIP LAMANG\n\n"
+            f"{item['birthday']}\n\n"
+            "Pindutin ulit para sa ibang format/example. Para sa totoong registration, sariling tamang birthday lamang.",
+            [[{"text": "🔀 Random na Birthday ulit", "callback_data": "birthday"}],
+             [{"text": "⬅️ Menu", "callback_data": "menu"}]])
     elif data == "guide":
         send_message(chat_id, guide_text(), main_menu())
     elif data == "faq":
