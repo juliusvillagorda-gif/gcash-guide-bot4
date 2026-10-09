@@ -4,8 +4,7 @@ import time
 import requests
 
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
-API = f"
-8482148717:AAEvtRhYOj99pHd5AVhTQ4Iq_hZ357fLyLk"
+API = f"https://api.telegram.org/bot{TOKEN}"
 
 MESSAGES = {
     "/start": (
